@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Alert, SafeAreaView, Text, TextInput } from 'react-native'
+import { Alert, Button, SafeAreaView, Text, TextInput, View } from 'react-native'
 import SQLite from 'react-native-sqlite-storage'
 import style from '../assets/style';
 
@@ -37,12 +37,34 @@ const ModificarScreen = function({ route, navigation})
         })
     }, [])
 
+    function onGuardarPress() {
+        db.transaction(tx => {
+            tx.executeSql(
+                'UPDATE contactos SET nombre = ?, telefono = ? WHERE id_contacto = ?',
+                [nombre, telefono, id_contacto],
+                (tx, result) => {
+                    if (result.rowsAffected.length === 0) {
+                        Alert.alert('No se actualizaron los datos. Intente de nuevo')
+                        return;
+                    }
+                    
+                    Alert.alert('Datos actualizados correctamente')
+                    navigation.goBack()
+                },
+                error => console.log(error)
+            )
+        })
+    }
+
     return (
         <SafeAreaView>
-            <Text>Nombre</Text>
-            <TextInput style={style.textInput} value={nombre} onChangeText={setNombre} />
-            <Text>Teléfono</Text>
-            <TextInput style={style.textInput} value={telefono} onChangeText={setTelefono} />
+            <View style={style.form}>
+                <Text>Nombre</Text>
+                <TextInput style={style.textInput} value={nombre} onChangeText={setNombre} />
+                <Text>Teléfono</Text>
+                <TextInput style={style.textInput} value={telefono} onChangeText={setTelefono} />
+                <Button title="Guardar" onPress={onGuardarPress} />
+            </View>
         </SafeAreaView>
     )
 }
