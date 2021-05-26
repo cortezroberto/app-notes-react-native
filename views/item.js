@@ -1,7 +1,8 @@
 import React from 'react'
 import { useEffect } from 'react';
+import { useReducer } from 'react';
 import { useState } from 'react';
-import { Button, SafeAreaView, Text, View } from 'react-native';
+import { Alert, Button, SafeAreaView, Text, View } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import style from '../assets/style'
 
@@ -19,6 +20,36 @@ const ItemScreen = function({ route, navigation }) {
 
     function onModificarPress() {
         navigation.navigate('modificarScreen', {id_contacto})
+    }
+
+    function onEliminarPress() {
+        Alert.alert('¿Desea elminar?',
+            '¿Está seguro que desea elminar el registro?\nEsta acción no se puede deshacer',
+            [
+                {
+                    text: "Sí",
+                    onPress: (v) => {
+                        db.transaction(tx => {
+                            tx.executeSql(
+                                'DELETE FROM contactos WHERE id_contacto = ?',
+                                [id_contacto],
+                                (tx, res) => {
+                                    if (res.rowsAffected === 0) {
+                                        Alert.alert('Fallo al eliminar', 'No se eliminó el registro')
+                                        return;
+                                    }
+
+                                    navigation.goBack()
+                                },
+                                error => console.log(error)
+                            )
+                        })
+                    }
+                },
+                {
+                    text: 'No'
+                }
+            ])
     }
 
     useEffect(function(){
@@ -47,7 +78,10 @@ const ItemScreen = function({ route, navigation }) {
                 <Text style={style.dataLabel}>Teléfono</Text>
                 <Text style={style.dataContent}>{telefono}</Text>
             </View>
-            <Button title="Modificar" onPress={onModificarPress} />
+            <View>
+                <Button title="Modificar" onPress={onModificarPress} />
+                <Button title="Eliminar" onPress={onEliminarPress} />
+            </View>
         </SafeAreaView>
     );
 }
