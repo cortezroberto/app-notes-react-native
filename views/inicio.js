@@ -1,30 +1,28 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react';
 import { Button, FlatList, SafeAreaView, TouchableOpacity, Text } from 'react-native'
+import { color } from 'react-native-reanimated';
 import SQLite from 'react-native-sqlite-storage'
 import style from '../assets/style'
 
-const db = SQLite.openDatabase({name:'mydata'});
+const db = SQLite.openDatabase({name:'mynote'});
 
 
 const InicioScreen = function({ navigation }) {
 
-    const [contactos, setContactos] = useState([]);
+    const [notas, setNotas] = useState([]);
 
     useEffect(function() {
         db.transaction(function(t) {
-            // t.executeSql('DROP TABLE IF EXISTS contactos',[],
-            //     () => console.log('DROPED TABLE contactos'),
-            //     error => console.log({error})
-            // );
             t.executeSql(
-                'CREATE TABLE IF NOT EXISTS contactos (' +
-                'id_contacto    INTEGER         PRIMARY KEY     AUTOINCREMENT,' +
-                'nombre         VARCHAR(128)    NOT NULL,' +
-                'telefono       VARCHAR(20)     NOT NULL' +
+                'CREATE TABLE IF NOT EXISTS notas (' +
+                'id_nota    INTEGER         PRIMARY KEY     AUTOINCREMENT,' +
+                'titulo         VARCHAR(20)    NOT NULL,' +
+                'descripcion       VARCHAR(128)     NOT NULL,' +
+                'color       VARCHAR(128)     NOT NULL' +
                 ');',
                 [],
-                () => console.log('CREATED TABLE contactos'),
+                () => console.log('CREATED TABLE notas'),
                 error => console.log({error})
             );
         })
@@ -33,37 +31,36 @@ const InicioScreen = function({ navigation }) {
     useEffect(function() {
         navigation.addListener('focus', function() {
             db.transaction(function(t) {
-                t.executeSql("SELECT * FROM contactos",[], function(tx, res) {
+                t.executeSql("SELECT * FROM notas",[], function(tx, res) {
                     let data = [];
                     for (let i = 0; i < res.rows.length; i++) {
                         data.push(res.rows.item(i));
                     }
-                    setContactos(data);
+                    setNotas(data);
                 }, (error) => { console.log({ error }) });
             });
         })
     }, [navigation]);
 
-    const contactoItem = function({ item }) {
+    const notaItem = function({ item }) {
         const onPress = function() {
-            // console.log({item});
-            navigation.navigate('itemScreen', {id_contacto:item.id_contacto})
+            navigation.navigate('itemScreen', {id_nota:item.id_nota})
         }
         return (
-            <TouchableOpacity onPress={onPress} style={style.itemContacto}>
-                <Text style={style.itemContactoTitle}>{item.nombre}</Text>
-                <Text style={style.itemContactoDetails}>{item.telefono}</Text>
+            <TouchableOpacity onPress={onPress} style={{backgroundColor: item.color, margin: 10, padding:10, height: 100, borderWidth: 1}}>
+                <Text style={style.itemNotaTitle}>{item.titulo}</Text>
+                <Text style={style.itemNotaDetails}>{item.descripcion}</Text>
             </TouchableOpacity>
         );
     }
 
     return (
         <SafeAreaView>
-            <Button title="Agregar" onPress={()=>navigation.navigate('agregarScreen')} />
+            <Button color= '#00d1b2' title="Nueva +" onPress={()=>navigation.navigate('agregarScreen')} />
             <FlatList
-                data={contactos}
-                renderItem={contactoItem}
-                keyExtractor={i=>i.id_contacto}
+                data={notas}
+                renderItem={notaItem}
+                keyExtractor={i=>i.id_nota}
             />
         </SafeAreaView>
     )

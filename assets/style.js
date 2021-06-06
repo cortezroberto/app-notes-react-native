@@ -1,14 +1,13 @@
 import { StyleSheet } from 'react-native'
 const style = StyleSheet.create({
-    itemContacto: {
-        padding: 12
-    },
-    itemContactoTitle: {
-        fontSize: 24,
+    itemNotaTitle: {
+        color: 'white',
+        fontSize: 20,
         fontWeight: 'bold'
     },
-    itemContactoDetails: {
-        fontSize: 14
+    itemNotaDetails: {
+        color: 'white',
+        fontSize: 18
     },
     form: {
         borderWidth: 1,
@@ -26,12 +25,14 @@ const style = StyleSheet.create({
         padding: 12
     },
     dataLabel: {
+        color: 'white',
         fontSize: 16
     },
     dataContent: {
-        fontSize: 32,
+        color: 'white',
+        fontSize: 24,
         fontWeight: 'bold'
-    }
+    },
 });
 
 export default style
