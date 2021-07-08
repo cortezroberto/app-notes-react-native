@@ -34,43 +34,57 @@ const ItemScreen = function({ route, navigation }) {
                 {
                     text: "Sí",
                     onPress: (v) => {
-                        db.transaction(tx => {
-                            tx.executeSql(
-                                'DELETE FROM notas WHERE id_nota = ?',
-                                [id_nota],
-                                (tx, res) => {
-                                    if (res.rowsAffected === 0) {
-                                        Alert.alert('Error al eliminar', 'No se eliminó la nota')
-                                        return;
-                                    }
+                        fetch(`http://192.168.1.110:3000/eliminar/${id_nota}`,{
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-type': 'application/json'
+                        },
+                    })
+                    .then(resp => resp.json())
+                    .then(data=> {
+                        console.log(data)
+                        navigation.goBack();
+                    })
+                    .catch(err=>console.log(err))
 
-                                    navigation.goBack()
-                                },
-                                error => console.log(error)
-                            )
-                        })
+                        // db.transaction(tx => {
+                        //     tx.executeSql(
+                        //         'DELETE FROM notas WHERE id_nota = ?',
+                        //         [id_nota],
+                        //         (tx, res) => {
+                        //             if (res.rowsAffected === 0) {
+                        //                 Alert.alert('Error al eliminar', 'No se eliminó la nota')
+                        //                 return;
+                        //             }
+
+                        //             navigation.goBack()
+                        //         },
+                        //         error => console.log(error)
+                        //     )
+                        // })
                     }
                 }
             ])
     }
 
-    useEffect(function(){
-        navigation.addListener('focus', function() {
-            db.transaction(function(tx) {
-                tx.executeSql("SELECT * FROM notas WHERE id_nota = ?",
-                [id_nota],
-                function(tx2, res) {
-                    if (res.rows.length === 0) {
-                        alert("No se encontró la nota");
-                        return;
-                    }
-                    let row = res.rows.item(0)
-                    setStates(row.titulo, row.descripcion, row.color)
-                },
-                error => console.log({error}))
-            })
-        })
-    }, [navigation]);
+    // useEffect(function(){
+    //     navigation.addListener('focus', function() {
+    //         db.transaction(function(tx) {
+    //             tx.executeSql("SELECT * FROM notas WHERE id_nota = ?",
+    //             [id_nota],
+    //             function(tx2, res) {
+    //                 if (res.rows.length === 0) {
+    //                     alert("No se encontró la nota");
+    //                     return;
+    //                 }
+    //                 let row = res.rows.item(0)
+    //                 setStates(row.titulo, row.descripcion, row.color)
+    //             },
+    //             error => console.log({error}))
+    //         })
+    //     })
+    // }, [navigation]);
 
     return (
         <SafeAreaView style={style.form}>

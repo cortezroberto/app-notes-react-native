@@ -28,17 +28,31 @@ const AgregarScreen = function({ navigation }) {
             return;
         }
 
-        db.transaction(function(t) {
-            t.executeSql("INSERT INTO notas (id_nota, titulo, descripcion, color) VALUES (null,?,?,?)",
-                [titulo, descripcion,color],
-                function(tx, res) {
-                    console.log(res)
-                    Alert.alert('¡Nota guardada!')
-                    navigation.goBack()
-                },
-                error => console.log({error})
-            );
-        });
+        fetch(`http://192.168.1.110:3000/insertar`,{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({titulo,descripcion,color})
+        })
+        .then(resp => {
+            navigation.goBack();
+        })
+        .catch(err=>console.log(err))
+        
+
+        // db.transaction(function(t) {
+        //     t.executeSql("INSERT INTO notas (id_nota, titulo, descripcion, color) VALUES (null,?,?,?)",
+        //         [titulo, descripcion,color],
+        //         function(tx, res) {
+        //             console.log(res)
+        //             Alert.alert('¡Nota guardada!')
+        //             navigation.goBack()
+        //         },
+        //         error => console.log({error})
+        //     );
+        // });
     }
 
     return (

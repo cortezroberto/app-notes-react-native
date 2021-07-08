@@ -16,7 +16,11 @@ import ModificarScreen from './views/modificar'
 
 
 const Stack = createStackNavigator();
+
 const App = () => {
+
+  const[host,setHost] = useState('http://192.168.1.110:3000');
+  const [alumnos, setAlumnos] = useState([]);
   return (
     <NavigationContainer>
       <Stack.Navigator>

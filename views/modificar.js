@@ -22,42 +22,57 @@ const ModificarScreen = function({ route, navigation})
         setColor(_color)
     }
 
-    useEffect(function() {
-        db.transaction((tx) => {
-            tx.executeSql(
-                'SELECT * FROM notas WHERE id_nota = ?',
-                [id_nota],
-                function(tx, result) {
-                    if (result.rows.length == 0) {
-                        Alert.alert("No existe la nota a modificar");
-                        navigation.goBack();
-                        return;
-                    }
+    // useEffect(function() {
+    //     // db.transaction((tx) => {
+    //     //     tx.executeSql(
+    //     //         'SELECT * FROM notas WHERE id_nota = ?',
+    //     //         [id_nota],
+    //     //         function(tx, result) {
+    //     //             if (result.rows.length == 0) {
+    //     //                 Alert.alert("No existe la nota a modificar");
+    //     //                 navigation.goBack();
+    //     //                 return;
+    //     //             }
 
-                    let registro = result.rows.item(0)
-                    setContacto(registro.titulo, registro.descripcion, registro.color)
-                }
-            )
-        })
-    }, [])
+    //     //             let registro = result.rows.item(0)
+    //     //             setContacto(registro.titulo, registro.descripcion, registro.color)
+    //     //         }
+    //     //     )
+    //     // })
+    // }, [])
 
     function onGuardarPress() {
-        db.transaction(tx => {
-            tx.executeSql(
-                'UPDATE notas SET titulo = ?, descripcion = ?, color= ? WHERE id_nota = ?',
-                [titulo, descripcion, color, id_nota],
-                (tx, result) => {
-                    if (result.rowsAffected.length === 0) {
-                        Alert.alert('No se actualizaron los datos. Intente de nuevo')
-                        return;
-                    }
-                    
-                    Alert.alert('Datos actualizados correctamente')
-                    navigation.goBack()
-                },
-                error => console.log(error)
-            )
+        fetch(`http://192.168.1.110:3000/actualizarPorId/${id_nota}`,{
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({titulo,descripcion,color})
         })
+        .then(resp => resp.json())
+        .then(data=> {
+            console.log(data)
+            navigation.goBack();
+        })
+        .catch(err=>console.log(err))
+
+        // db.transaction(tx => {
+        //     tx.executeSql(
+        //         'UPDATE notas SET titulo = ?, descripcion = ?, color= ? WHERE id_nota = ?',
+        //         [titulo, descripcion, color, id_nota],
+        //         (tx, result) => {
+        //             if (result.rowsAffected.length === 0) {
+        //                 Alert.alert('No se actualizaron los datos. Intente de nuevo')
+        //                 return;
+        //             }
+                    
+        //             Alert.alert('Datos actualizados correctamente')
+        //             navigation.goBack()
+        //         },
+        //         error => console.log(error)
+        //     )
+        // })
     }
 
     return (

@@ -13,32 +13,20 @@ const InicioScreen = function({ navigation }) {
     const [notas, setNotas] = useState([]);
 
     useEffect(function() {
-        db.transaction(function(t) {
-            t.executeSql(
-                'CREATE TABLE IF NOT EXISTS notas (' +
-                'id_nota    INTEGER         PRIMARY KEY     AUTOINCREMENT,' +
-                'titulo         VARCHAR(20)    NOT NULL,' +
-                'descripcion       VARCHAR(128)     NOT NULL,' +
-                'color       VARCHAR(128)     NOT NULL' +
-                ');',
-                [],
-                () => console.log('CREATED TABLE notas'),
-                error => console.log({error})
-            );
-        })
-    }, []);
-
-    useEffect(function() {
         navigation.addListener('focus', function() {
-            db.transaction(function(t) {
-                t.executeSql("SELECT * FROM notas",[], function(tx, res) {
-                    let data = [];
-                    for (let i = 0; i < res.rows.length; i++) {
-                        data.push(res.rows.item(i));
-                    }
-                    setNotas(data);
-                }, (error) => { console.log({ error }) });
-            });
+            fetch(`http://192.168.1.110:3000/consultar`)
+            .then(resp => resp.json())
+            .then(({data}) => setNotas(data))
+            .catch(err=>console.log(err))
+            // db.transaction(function(t) {
+            //     t.executeSql("SELECT * FROM notas",[], function(tx, res) {
+            //         let data = [];
+            //         for (let i = 0; i < res.rows.length; i++) {
+            //             data.push(res.rows.item(i));
+            //         }
+            //         setNotas(data);
+            //     }, (error) => { console.log({ error }) });
+            // });
         })
     }, [navigation]);
 
